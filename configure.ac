@@ -38,6 +38,7 @@ AM_CONDITIONAL([CPU_PPC64LE], [test "$CPU" = "ppc64le"])
 AM_CONDITIONAL([CPU_RISCV64], [test "$CPU" = "riscv64"])
 AM_CONDITIONAL([CPU_UNDEFINED], [test "x$CPU" = "x"])
 AM_CONDITIONAL([HAVE_RVV], [false])
+AM_CONDITIONAL([HAVE_ZICBOP], [false])
 
 # Check for programs
 AC_PROG_CC_STDC
@@ -70,9 +71,28 @@ case "${CPU}" in
 			[AC_DEFINE([HAVE_RVV], [0], [Disable RVV instructions])
 			AM_CONDITIONAL([HAVE_RVV], [false]) rvv=no]
 		)
+		AC_MSG_CHECKING([Zicbop support])
+		AC_COMPILE_IFELSE(
+			[AC_LANG_PROGRAM([], [
+				__asm__ volatile(
+					".option arch, +zicbop\n"
+					".insn i 0x0F, 0, x0, x0, 0x010" ::: "memory"
+				);
+			])],
+			[AC_DEFINE([HAVE_ZICBOP], [1], [Enable Zicbop instructions])
+			AM_CONDITIONAL([HAVE_ZICBOP], [true]) zicbop=yes],
+			[AC_DEFINE([HAVE_ZICBOP], [0], [Disable Zicbop instructions])
+			AM_CONDITIONAL([HAVE_ZICBOP], [false]) zicbop=no]
+		)
+		AC_MSG_RESULT([$zicbop])
 		if test "x$rvv" = "xyes"; then
-		  CFLAGS+=" -march=rv64gcv"
-		  CCASFLAGS+=" -march=rv64gcv"
+			if test "x$zicbop" = "xyes"; then
+				CFLAGS+=" -march=rv64gcv_zicbop"
+				CCASFLAGS+=" -march=rv64gcv_zicbop"
+			else
+				CFLAGS+=" -march=rv64gcv"
+				CCASFLAGS+=" -march=rv64gcv"
+			fi
 		fi
 		AC_MSG_RESULT([$rvv])
 		;;

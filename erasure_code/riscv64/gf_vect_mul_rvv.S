@@ -67,7 +67,7 @@ gf_vect_mul_rvv:
     andi x_tmp, x_len, 0x1F
     bnez x_tmp, .return_fail
 
-    vsetvli t6, x0, e8, m1
+    vsetvli t6, x0, e8, m1, ta, ma
 
     /* Load pre-calculated constants into v_gft1_lo and v_gft1_hi */
     vle8.v v_gft1_lo, (x_tbl)
