@@ -74,8 +74,7 @@ gf_2vect_dot_prod_rvv:
     li t6, 16
     blt x_len, t6, .return_fail
 
-    vsetvli a5, x0, e8, m1  /* Set vector length to maximum */
-
+    vsetvli a5, x0, e8, m1,ta,ma  /* Set vector length to maximum */
     li x_pos, 0
     ld x_dest1, 0(x_dest)
     ld x_dest2, 8(x_dest)
@@ -119,6 +118,9 @@ gf_2vect_dot_prod_rvv:
     addi x_tbl2, x_tbl2, 16
     vle8.v v_gft2_hi, (x_tbl2)
     addi x_tbl2, x_tbl2, 16
+
+    prefetch.r 0(x_tbl1)
+    prefetch.r 0(x_tbl2)
 
     /* dest 1 */
     /* table indexing, ie. gf(2^8) multiplication */

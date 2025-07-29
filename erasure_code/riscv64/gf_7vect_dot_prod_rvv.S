@@ -112,8 +112,7 @@ gf_7vect_dot_prod_rvv:
     sd s7, 56(sp)
     sd s8, 64(sp)
 
-    vsetvli t0, x0, e8, m1
-
+    vsetvli t0, x0, e8, m1,ta,ma
     /* initialize position */
     li x_pos, 0
 
@@ -181,6 +180,9 @@ gf_7vect_dot_prod_rvv:
     vle8.v v_gft2_hi, (x_tbl2)
     addi x_tbl2, x_tbl2, 16
 
+    prefetch.r 0(x_tbl1)
+    prefetch.r 0(x_tbl2)
+
     vle8.v v_gft3_lo, (x_tbl3)
     addi x_tbl3, x_tbl3, 16
     vle8.v v_gft3_hi, (x_tbl3)
@@ -191,6 +193,8 @@ gf_7vect_dot_prod_rvv:
     vle8.v v_gft4_hi, (x_tbl4)
     addi x_tbl4, x_tbl4, 16
 
+    prefetch.r 0(x_tbl3)
+    prefetch.r 0(x_tbl4)
     vle8.v v_gft5_lo, (x_tbl5)
     addi x_tbl5, x_tbl5, 16
     vle8.v v_gft5_hi, (x_tbl5)
@@ -205,7 +209,9 @@ gf_7vect_dot_prod_rvv:
     addi x_tbl7, x_tbl7, 16
     vle8.v v_gft7_hi, (x_tbl7)
     addi x_tbl7, x_tbl7, 16
-
+    prefetch.r 0(x_tbl5)
+    prefetch.r 0(x_tbl6)
+    prefetch.r 0(x_tbl7)
 
     /* dest 1 */
     vrgather.vv v26, v_gft1_lo, v_src_lo

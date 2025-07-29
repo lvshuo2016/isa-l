@@ -95,8 +95,7 @@ gf_5vect_dot_prod_rvv:
     sd s4, 32(sp)
     sd s5, 40(sp)
 
-    vsetvli a5, x0, e8, m1
-
+    vsetvli a5, x0, e8, m1,ta,ma
     /* Initialize position */
     li x_pos, 0
 
@@ -151,6 +150,9 @@ gf_5vect_dot_prod_rvv:
     vle8.v v_gft2_hi, (x_tbl2)
     addi x_tbl2, x_tbl2, 16
 
+    prefetch.r 0(x_tbl1)
+    prefetch.r 0(x_tbl2)
+
     /* Move to next source vector */
     addi x_vec_i, x_vec_i, 1
 
@@ -171,6 +173,9 @@ gf_5vect_dot_prod_rvv:
     vle8.v v_gft4_hi, (x_tbl4)
     addi x_tbl4, x_tbl4, 16
 
+    prefetch.r 0(x_tbl3)
+    prefetch.r 0(x_tbl4)
+
     /* dest 2 */
     vrgather.vv v26, v_gft2_lo, v_src_lo
     vrgather.vv v27, v_gft2_hi, v_src_hi
@@ -188,6 +193,7 @@ gf_5vect_dot_prod_rvv:
     addi x_tbl5, x_tbl5, 16
     vle8.v v_gft5_hi, (x_tbl5)
     addi x_tbl5, x_tbl5, 16
+    prefetch.r 0(x_tbl5)
 
     /* dest 4 */
     vrgather.vv v26, v_gft4_lo, v_src_lo

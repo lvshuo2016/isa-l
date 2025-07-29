@@ -84,8 +84,7 @@ gf_3vect_dot_prod_rvv:
     sd s0, 0(sp)
     sd s1, 8(sp)
 
-    vsetvli a7, x0, e8, m1  /* Set vector length to maximum */
-
+    vsetvli a7, x0, e8, m1,ta,ma  /* Set vector length to maximum */
     li x_pos, 0
     slli t_offset, x_vec, 5
     ld x_dest1, 0(x_dest)
@@ -131,14 +130,17 @@ gf_3vect_dot_prod_rvv:
     vle8.v v_gft2_hi, (x_tbl2)
     addi x_tbl2, x_tbl2, 16
 
+    prefetch.r 0(x_tbl1)
+    prefetch.r 0(x_tbl2)
 
     /* Load next gf_table's */
     vle8.v v_gft3_lo, (x_tbl3)
     addi x_tbl3, x_tbl3, 16
     vle8.v v_gft3_hi, (x_tbl3)
     addi x_tbl3, x_tbl3, 16
+    prefetch.r 0(x_tbl3)
 
-/* dest 1 */
+    /* dest 1 */
     vrgather.vv v26, v_gft1_lo, v_src_lo
     vrgather.vv v27, v_gft1_hi, v_src_hi
     vxor.vv v_dest1, v_dest1, v26
